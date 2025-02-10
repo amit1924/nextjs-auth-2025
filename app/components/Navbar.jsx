@@ -1,44 +1,14 @@
-// "use client"; // ✅ Mark as Client Component
-
-// import Link from "next/link";
-// import { useSession, signOut } from "next-auth/react";
-
-// export const Navbar = () => {
-//   const { data: session } = useSession();
-
-//   return (
-//     <nav className="bg-gray-900 p-4 text-purpleAccent font-poppins">
-//       <div className="flex justify-between items-center">
-//         <Link href="/">Home</Link>
-//         <div className="flex gap-4">
-//           {!session ? (
-//             <>
-//               <Link href="/login">Login</Link>
-//               <Link href="/signup">Signup</Link>
-//             </>
-//           ) : (
-//             <>
-//               <Link href="/dashboard">Dashboard</Link>
-//               {session.user?.role === "admin" && (
-//                 <Link href="/admin">Admin</Link>
-//               )}
-//               <button onClick={() => signOut()}>Logout</button>
-//             </>
-//           )}
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// };
-
 "use client"; // ✅ Mark as Client Component
 
+import { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
+import { FiMenu, FiX } from "react-icons/fi";
 
 export const Navbar = () => {
   const { data: session } = useSession();
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <motion.nav
@@ -58,8 +28,16 @@ export const Navbar = () => {
           </Link>
         </motion.div>
 
-        {/* Navigation Links */}
-        <div className="flex gap-6">
+        {/* Hamburger Menu Button */}
+        <button
+          className="md:hidden text-2xl"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          {isOpen ? <FiX /> : <FiMenu />}
+        </button>
+
+        {/* Navigation Links (Desktop) */}
+        <div className="hidden md:flex gap-6">
           {!session ? (
             <>
               <motion.div whileHover={{ scale: 1.1 }}>
@@ -110,6 +88,63 @@ export const Navbar = () => {
           )}
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <motion.div
+          className="md:hidden flex flex-col items-center bg-gray-800 p-4 mt-2 rounded-lg space-y-4"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          {!session ? (
+            <>
+              <Link
+                href="/login"
+                className="text-white text-lg hover:text-purple-300"
+                onClick={() => setIsOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                href="/signup"
+                className="text-white text-lg hover:text-pink-300"
+                onClick={() => setIsOpen(false)}
+              >
+                Signup
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/dashboard"
+                className="text-white text-lg hover:text-purple-300"
+                onClick={() => setIsOpen(false)}
+              >
+                Dashboard
+              </Link>
+              {session.user?.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="text-white text-lg hover:text-pink-300"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
+              <button
+                className="text-lg bg-red-600 px-4 py-2 rounded-lg text-white shadow-md hover:bg-red-700"
+                onClick={() => {
+                  setIsOpen(false);
+                  signOut();
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
+        </motion.div>
+      )}
     </motion.nav>
   );
 };
