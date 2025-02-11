@@ -11,12 +11,17 @@ const Page = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signingInWithCredentials, setSigningInWithCredentials] =
+    useState(false);
+  const [signingInWithGithub, setSigningInWithGithub] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSigningInWithCredentials(true);
 
     if (!email || !password) {
       toast.error("All fields are required");
+      setSigningInWithCredentials(false);
       return;
     }
 
@@ -35,6 +40,19 @@ const Page = () => {
       }
     } catch (error) {
       toast.error(error.message || "Something went wrong");
+    } finally {
+      setSigningInWithCredentials(false);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    setSigningInWithGithub(true);
+    try {
+      await signIn("github", { callbackUrl: "/dashboard" });
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setSigningInWithGithub(false);
     }
   };
 
@@ -83,19 +101,27 @@ const Page = () => {
                 type="submit"
                 className="w-full py-3 px-4 text-sm tracking-wide text-white bg-black hover:bg-[#111] focus:outline-none"
               >
-                Login
+                {signingInWithCredentials ? (
+                  <h3 className="bg-green-500 p-2 rounded-lg">
+                    Logging in...{" "}
+                  </h3>
+                ) : (
+                  "Login"
+                )}
               </button>
             </div>
             <p className="mt-2 flex flex-col items-center">OR</p>
             <div className="mt-6 flex flex-col items-center">
               <button
                 type="button"
-                onClick={
-                  () => signIn("github", { callbackUrl: "/dashboard" }) // Redirect to the dashboard
-                }
+                onClick={handleGithubLogin}
                 className="bg-gray-900 text-white rounded-lg px-4 py-2 hover:bg-green-800 transition"
               >
-                Sign in with GitHub
+                {signingInWithGithub ? (
+                  <h3 className="bg-green-500 p-2 rounded-lg">Logging in...</h3>
+                ) : (
+                  "Login with GitHub"
+                )}
               </button>
             </div>
 

@@ -5,10 +5,24 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { motion } from "framer-motion";
 import { FiMenu, FiX } from "react-icons/fi";
+import toast, { Toaster } from "react-hot-toast";
 
 export const Navbar = () => {
   const { data: session } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await signOut({ callbackUrl: "/login" });
+      toast.success("Successfully logged out");
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoggingOut(false);
+    }
+  };
 
   return (
     <motion.nav
@@ -19,6 +33,7 @@ export const Navbar = () => {
     >
       <div className="flex justify-between items-center container mx-auto">
         {/* Home Link with Glow */}
+        <Toaster position="top-center" reverseOrder={false} />
         <motion.div whileHover={{ scale: 1.1 }}>
           <Link
             href="/"
@@ -80,9 +95,15 @@ export const Navbar = () => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 className="px-5 py-2 bg-red-600 text-white rounded-lg shadow-[0px_0px_15px_4px_rgba(255,0,0,0.6)] transition-all duration-300 hover:shadow-[0px_0px_25px_6px_rgba(255,0,0,0.8)]"
-                onClick={() => signOut()}
+                onClick={handleLogout}
               >
-                Logout
+                {loggingOut ? (
+                  <h3 className="bg-green-500 py-2 px-5 rounded-lg">
+                    Logging Out...
+                  </h3>
+                ) : (
+                  "Logout"
+                )}
               </motion.button>
             </>
           )}

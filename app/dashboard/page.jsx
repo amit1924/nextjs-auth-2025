@@ -3,9 +3,12 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 
 const DashboardPage = () => {
   const { data: session, status } = useSession();
+  const [loggingOut, setLoggingOut] = useState(false);
   const router = useRouter();
 
   if (status === "loading") {
@@ -17,8 +20,21 @@ const DashboardPage = () => {
     return null;
   }
 
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await signOut({ callbackUrl: "/login" });
+      toast.success("Successfully logged out");
+    } catch (error) {
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoggingOut(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
+      <Toaster position="top-center" reverseOrder={false} />
       {/* Neon Border Container */}
       <motion.div
         className="relative p-6 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-center 
@@ -105,7 +121,7 @@ const DashboardPage = () => {
 
         {/* Logout Button */}
         <motion.button
-          onClick={() => signOut({ callbackUrl: "/login" })}
+          onClick={handleLogout}
           whileHover={{ scale: 1.1 }}
           className="col-span-1 md:col-span-2 lg:col-span-3 px-5 py-2 bg-red-500 text-white font-semibold rounded-lg
           shadow-[0px_0px_15px_4px_rgba(255,0,0,0.6)] transition-all duration-300 hover:shadow-[0px_0px_25px_6px_rgba(255,0,0,0.8)]"
@@ -113,7 +129,13 @@ const DashboardPage = () => {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          Logout
+          {loggingOut ? (
+            <h3 className="bg-green-500 md:col-span-2 lg:col-span-3 px-5 py-2 rounded-lg">
+              Logging Out...
+            </h3>
+          ) : (
+            "Logout"
+          )}
         </motion.button>
       </motion.div>
     </div>
