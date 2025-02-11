@@ -21,7 +21,7 @@ const DashboardPage = () => {
   }
 
   const handleLogout = async () => {
-    setLoggingOut(true);
+    await signOut({ callbackUrl: "/login" });
     try {
       await signOut({ callbackUrl: "/login" });
       toast.success("Successfully logged out");
