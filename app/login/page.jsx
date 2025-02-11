@@ -90,7 +90,9 @@ const Page = () => {
             <div className="mt-6 flex flex-col items-center">
               <button
                 type="button"
-                onClick={() => signIn("github")}
+                onClick={
+                  () => signIn("github", { callbackUrl: "/dashboard" }) // Redirect to the dashboard
+                }
                 className="bg-gray-900 text-white rounded-lg px-4 py-2 hover:bg-green-800 transition"
               >
                 Sign in with GitHub
