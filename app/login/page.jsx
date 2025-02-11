@@ -28,7 +28,6 @@ const Page = () => {
       });
 
       if (result?.error) {
-        setError("Invalid email or password");
         toast.error("Invalid email or password");
       } else {
         toast.success("Login successful!");
@@ -87,8 +86,18 @@ const Page = () => {
                 Login
               </button>
             </div>
+            <p className="mt-2 flex flex-col items-center">OR</p>
+            <div className="mt-6 flex flex-col items-center">
+              <button
+                type="button"
+                onClick={() => signIn("github")}
+                className="bg-gray-900 text-white rounded-lg px-4 py-2 hover:bg-green-800 transition"
+              >
+                Sign in with GitHub
+              </button>
+            </div>
 
-            <p className="text-sm mt-6 text-center text-gray-800">
+            <p className="text-sm mt-9 text-center text-gray-800">
               Don't have an account?{" "}
               <Link
                 href="/signup"
